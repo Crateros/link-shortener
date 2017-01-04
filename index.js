@@ -3,7 +3,7 @@ var bodyParser = require('body-parser');
 var ejsLayouts = require('express-ejs-layouts');
 var path = require('path');
 var Hashids = require("hashids");
-var hashids = new Hashids("this is a salty hashbrown");
+var hashids = new Hashids("this is a salty hashbrown cooked at a temp of 425F.");
 
 var app = express();
 var db = require("./models");
@@ -26,9 +26,30 @@ app.post('/links', function(req, res){
   });
 });
 
-app.get('/links/:id', function(req, res){
+app.get('/links/:id', function(req,res){
+  db.link.find({
+    where: {id: req.params.id},
+  })
+  .then(function(link){
+    var hash = hashids.encode(link.id);
+    console.log("Hash is "+hash);
+    res.render('links', {hash:hash, link: link});
+  });
+});
 
-})
+app.get('/:hash', function(req,res){
+  console.log(req.params.hash);
+  var hash = hashids.decode(req.params.hash);
+  console.log("decoded is "+hash);
+  db.link.find({
+    where: {id: hash},
+  })
+  .then(function(link){
+    console.log(link);
+    link.increment('count');
+    res.redirect(link.url);
+  });
+});
 
 var server = app.listen(process.env.PORT || 3000);
 

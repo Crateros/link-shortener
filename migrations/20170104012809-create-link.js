@@ -11,6 +11,10 @@ module.exports = {
       url: {
         type: Sequelize.TEXT
       },
+      count: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
